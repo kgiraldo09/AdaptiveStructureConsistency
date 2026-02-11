@@ -81,8 +81,9 @@ python train.py --cfg /configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ 
 | `--model` | Model that will be used |
 | `--lambda_ngf` | Weight for NGF loss |
 | `--epsilonT` and `--multi_parameter`| Fixed target domain tolerance parameter (ratio): `--epsilonT` * `--multi_parameter`|
-
 | `--epsilon_multi_scale` | use of multi scale discriminator for edge domain only |
+
+**Do not forget to update your config file!**
 
 ---
 
