@@ -75,7 +75,7 @@ python train.py --cfg /configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ 
 
 | Parameter | Description |
 |-----------|-------------|
-| `--cfg` | Path to dataset configuration |
+| `--cfg` | Path to dataset configuration file, update it with your own paths |
 | `--checkpoints_dir` | Path where the output folder containing model and experiment results will be created |
 | `--name` | Output file name |
 | `--model` | Model that will be used |
