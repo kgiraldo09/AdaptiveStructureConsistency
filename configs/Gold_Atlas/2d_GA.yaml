@@ -1,7 +1,6 @@
 options:
     input_dir : '/home/ids/kgiraldo/These/DATA/GOLD_ATLAS/GA_masked' # where is the data
     input_dir_processed : input_dir + '_2d_256_new' # where 2d images will be stored for training
-    results_dir : '/home/ids/kgiraldo/These/results/BRATS2518/NGF_2D_T12T2_final_k5'
     batch_size : 1 # batch size
     NUM_SAMPLES_MAX : 200 # number of samples per image
 data_loaders:
