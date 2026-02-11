@@ -1,0 +1,47 @@
+options:
+    input_dir : '/home/ids/kgiraldo/These/DATA/GOLD_ATLAS/GA_masked' # where is the data
+    input_dir_processed : input_dir + '_2d_256_new' # where 2d images will be stored for training
+    results_dir : '/home/ids/kgiraldo/These/results/BRATS2518/NGF_2D_T12T2_final_k5'
+    batch_size : 1 # batch size
+    NUM_SAMPLES_MAX : 200 # number of samples per image
+data_loaders:
+    imports:
+        dataloader : data_loader_GA #dataloader class, from utils.dataloaders
+    # transfromations on the images
+    train_pre_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False)
+        - EnsureChannelFirstd(keys=["SRC", "TGT"])
+        - ScaleIntensityRangePercentilesd(keys=["SRC"], lower=1, upper=99, b_min=-1,b_max=1, clip=True)
+        - ScaleIntensityRanged(keys=["TGT"], a_min=-1000,a_max=1000, b_min=-1.0, b_max=1.0,clip=True)
+        - RandSpatialCropSamplesdWithMinNonZero_3d(keys=["SRC", "TGT"], roi_size=(256,256,1), random_size=False, num_samples=NUM_SAMPLES_MAX, percentage = 0.05)
+        - SpatialPadd(keys=["SRC", "TGT"], spatial_size=(256,256,1), mode="constant", constant_values=-1)
+        - SqueezeDimd(keys=["SRC", "TGT"], dim=0)
+    val_pre_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False)
+        - EnsureChannelFirstd(keys=["SRC", "TGT"])
+        - ScaleIntensityRangePercentilesd(keys=["SRC"], lower=1, upper=99, b_min=-1,b_max=1, clip=True)
+        - ScaleIntensityRanged(keys=["TGT"], a_min=-1000,a_max=1000, b_min=-1.0, b_max=1.0,clip=True)
+        - RandSpatialCropSamplesdWithMinNonZero_3d(keys=["SRC", "TGT"], roi_size=(256,256,1), random_size=False, num_samples=NUM_SAMPLES_MAX, percentage = 0.05)
+        - SpatialPadd(keys=["SRC", "TGT"], spatial_size=(256,256,1), mode="constant", constant_values=-1)
+        - SqueezeDimd(keys=["SRC", "TGT"], dim=0)
+    test_pre_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False)
+        - EnsureChannelFirstd(keys=["SRC", "TGT"])
+        - ScaleIntensityRangePercentilesd(keys=["SRC"], lower=1, upper=99, b_min=-1,b_max=1, clip=True)
+        - ScaleIntensityRanged(keys=["TGT"], a_min=-1000,a_max=1000, b_min=-1.0, b_max=1.0,clip=True)
+        - CenterSpatialCropd(keys=["SRC", "TGT"], roi_size=(-1,-1,-1))
+        - SqueezeDimd(keys=["SRC", "TGT"], dim=0)
+    fly_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False)
+        - EnsureChannelFirstd(keys=["SRC", "TGT"])
+    SlidingWindowInferer:
+        roi_size : [256, 256]  # Patch size (height, width, depth)
+        sw_batch_size : 1  # Number of patches to process at once
+        overlap : 0.8  # Overlap between patches
+        spatial_dim : 0 # axis for 2D inferer
+        cval : -1 # value for padding
+
+
+
+
+
