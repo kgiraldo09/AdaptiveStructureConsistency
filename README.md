@@ -107,7 +107,9 @@ The framework automatically computes **Image Quality** metrics: PSNR, SSIM, Haar
 
 Those are store in `--checkpoints_dir` / `--name` / inf / metrics_{`--name`}.csv:
 
-### Other model architectures training:
+---
+
+## Other model architectures training:
 #### Cycle GAN
 ```bash
 python train.py --cfg configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name CycleGAN --model cycle_gan --lambda_A 10 --lambda_B 10
