@@ -1,13 +1,12 @@
 import sys
 import utils.data_loaders
-from utils.options import Options
-from externals.cycle.options.train_options import TrainOptions
+from utils.optionsDL import Options
+from utils.train_options import TrainOptions
 # from logger import *
 from utils.loops_train import train_loop, val_loop, metrics_segmentation, metrics_generator
 import pandas as pd
 import time
-from externals.cycle.models import create_model
-#from externals.cycle.util.visualizer import Visualizer
+from models import create_model
 import yaml 
 from tqdm import tqdm
 from pathlib import Path
@@ -173,16 +172,11 @@ if __name__ == '__main__':
                         fake_B = gen(real_A)
                     real_B_ = real_B[0,0].detach().cpu().numpy()
                     fake_B_ = fake_B[0,0].detach().cpu().numpy()
-                    # if segmentation
-                    if opt_cfg.ADAS_seg:
-                        pred = model.segmentator(fake_B)
-                        current_psnr = dice_safe(pred, real_B).detach().cpu().numpy()
+                    # is PSNR using histogram matching or not ignoring background
+                    if opt.HM:
+                        current_psnr = psnr(match_histograms(fake_B_[real_B_!=-1], real_B_[real_B_!=-1]), real_B_[real_B_!=-1], data_range = 2)
                     else:
-                        # is PSNR using histogram matching or not ignoring background
-                        if opt.HM:
-                            current_psnr = psnr(match_histograms(fake_B_[real_B_!=-1], real_B_[real_B_!=-1]), real_B_[real_B_!=-1], data_range = 2)
-                        else:
-                            current_psnr = psnr(fake_B_[real_B_!=-1], real_B_[real_B_!=-1], data_range = 2)
+                        current_psnr = psnr(fake_B_[real_B_!=-1], real_B_[real_B_!=-1], data_range = 2)
                     current_metric.append(current_psnr)
 
                     # calculating images to plot after validation
@@ -325,6 +319,10 @@ if __name__ == '__main__':
                 real_B_ = real_B[0,0].detach().cpu().numpy().copy()
                 # nibabel affine and header for nibabel outpout
                 nib_real = nib.load(fname_ref)
+                output_masked = output.copy()
+                output_masked[real_B_ == -1] = -1
+                nib.save(nib.Nifti1Image(output_masked, nib_real.affine, nib_real.header), str(fname_out).replace('sCenter.nii', permute[perind][2] + '.nii'))
+                
                 if opt.harmonisation:
                     output[real_B_== -1] = -1
                     nib.save(nib.Nifti1Image(output, nib_real.affine, nib_real.header), str(fname_out).replace('sCenter.nii', permute[perind][2] + '.nii'))
@@ -337,16 +335,9 @@ if __name__ == '__main__':
                     nib.save(nib.Nifti1Image(NGF_real_B, nib_real.affine, nib_real.header), str(fname_out).replace('_sCenter.nii', f'_{opt.name}_NGF_real_target.nii'))
                     nib.save(nib.Nifti1Image(NGF_real_A, nib_real.affine, nib_real.header), str(fname_out).replace('_sCenter.nii', f'_{opt.name}_NGF_real_source.nii'))
                 if not opt.skip_metrics:
-                    # segmentation metrics and image translation metrics
-                    if opt_cfg.ADAS_seg:
-                        output_t = torch.tensor(output)[None,None].permute((0,1,4,2,3)).cuda()
-                        output_seg = window_inferer(inputs=output_t, network=model.segmentator)
-                        output_seg = output_seg[0,0].permute(permute[perind][1]).detach().cpu().numpy().copy()
-                        metrics_segmentation(real_B_, output_seg.copy(), dicts_out[perind*2])
-                        nib.save(nib.Nifti1Image(output_seg, nib_real.affine, nib_real.header), str(fname_out).replace('_sCenter.nii', f'_{opt.name}_seg.nii'))
-                    else:        
-                        metrics_generator(real_B_, output.copy(), dicts_out[perind*2], real_B_ != -1000, mask = True)
-                        print(dicts_out[perind*2]['PSNR'][-1])
+                    # image translation metrics   
+                    metrics_generator(real_B_, output.copy(), dicts_out[perind*2], real_B_ != -1000, mask = True)
+                    print(dicts_out[perind*2]['PSNR'][-1])
                 # if histogram matching is necessary for output images
                 if opt.HM:
                     output[real_B_ != -1] = match_histograms(output[real_B_ != -1], real_B_[real_B_ != -1])

@@ -1,0 +1,46 @@
+options:
+    input_dir : '/home/ids/kgiraldo/These/DATA/GOLD_ATLAS/GA_masked' # where the original data is located
+    input_dir_processed : input_dir + '_3d_180_new' # directory where processed 3D images will be stored for training
+    batch_size : 1 # number of images per training batch
+    NUM_SAMPLES_MAX : 200 # maximum number of samples to extract per image during cropping
+
+data_loaders:
+    imports:
+        dataloader : data_loader_GA # dataloader class, from utils.data_loaders
+    # Transformations applied to training, validation, test, and fly images
+    train_pre_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False) # load source (SRC) and target (TGT) images
+        - EnsureChannelFirstd(keys=["SRC", "TGT"]) # make channel dimension first
+        - ScaleIntensityRangePercentilesd(keys=["SRC"], lower=1, upper=99, b_min=-1,b_max=1, clip=True) # scale source image intensity to [-1,1] based on 1-99 percentiles
+        - ScaleIntensityRanged(keys=["TGT"], a_min=-1000,a_max=1000, b_min=-1.0, b_max=1.0,clip=True) # scale target image intensity to [-1,1] based on fixed min/max
+        - RandSpatialCropSamplesdWithMinNonZero_3d(keys=["SRC", "TGT"], roi_size=(128,128,128), random_size=False, num_samples=NUM_SAMPLES_MAX, percentage = 0.2) # crop patches with at least 5% non-zero pixels
+        - SpatialPadd(keys=["SRC", "TGT"], spatial_size=(128,128,128), mode="constant", constant_values=-1) # pad patches to 256x256x1 if needed
+        - SqueezeDimd(keys=["SRC", "TGT"], dim=0) # remove singleton dimension at axis 0
+
+    val_pre_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False) # same as train
+        - EnsureChannelFirstd(keys=["SRC", "TGT"]) # ensure channels first
+        - ScaleIntensityRangePercentilesd(keys=["SRC"], lower=1, upper=99, b_min=-1,b_max=1, clip=True) # normalize source
+        - ScaleIntensityRanged(keys=["TGT"], a_min=-1000,a_max=1000, b_min=-1.0, b_max=1.0,clip=True) # normalize target
+        - RandSpatialCropSamplesdWithMinNonZero_3d(keys=["SRC", "TGT"], roi_size=(128,128,128), random_size=False, num_samples=NUM_SAMPLES_MAX, percentage = 0.2) # crop validation patches
+        - SpatialPadd(keys=["SRC", "TGT"], spatial_size=(128,128,128), mode="constant", constant_values=-1) # pad patches
+        - SqueezeDimd(keys=["SRC", "TGT"], dim=0) # remove singleton dimension
+
+    test_pre_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False) # load test images
+        - EnsureChannelFirstd(keys=["SRC", "TGT"]) # channels first
+        - ScaleIntensityRangePercentilesd(keys=["SRC"], lower=1, upper=99, b_min=-1,b_max=1, clip=True) # normalize source
+        - ScaleIntensityRanged(keys=["TGT"], a_min=-1000,a_max=1000, b_min=-1.0, b_max=1.0,clip=True) # normalize target
+        - CenterSpatialCropd(keys=["SRC", "TGT"], roi_size=(-1,-1,-1)) # center crop (full image in this case)
+        - SqueezeDimd(keys=["SRC", "TGT"], dim=0) # remove singleton dimension
+
+    fly_transform:
+        - LoadImaged(keys=["SRC", "TGT"], image_only=False) # load images for inference or visualization
+        - EnsureChannelFirstd(keys=["SRC", "TGT"]) # channels first for fly images
+
+    SlidingWindowInferer:
+        roi_size : [128, 128, 128]  # patch size for sliding window inference (height, width)
+        sw_batch_size : 4  # number of patches processed at once during inference
+        overlap : 0.8  # overlap fraction between adjacent patches
+        padding_mode : constant
+        cval : -1 # padding value for areas outside the image during inference

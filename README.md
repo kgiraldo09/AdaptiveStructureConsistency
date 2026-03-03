@@ -65,10 +65,13 @@ datasets/
 
 ## Training
 
-### Basic Training Command
+### Basic Training Command 2D and 3D
 
 ```bash
 python train.py --cfg /configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name AdaNGF --model AdaNGF --lambda_edge 10 --netG resnet_9blocks2 --epsilonT 0.000025 --multi_parameter 8.0 --epsilon_multi_scale
+```
+```bash
+python python train.py --cfg configs/Gold_Atlas/3d_GA.yaml --checkpoints_dir results/ --name AdaNGF_3D --model AdaNGF --lambda_edge 10 --netG resnet_9blocks2 --epsilonT 0.0000025 --multi_parameter 80.0 --epsilon_multi_scale --dim 3
 ```
 
 ### Training Parameters
@@ -89,10 +92,13 @@ python train.py --cfg /configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ 
 
 ## Testing
 
-### Basic Testing Command
+### Basic Testing Command 2D and 3D
 
 ```bash
-python train.py --cfg /configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name AdaNGF --model AdaNGF --lambda_edge 10 --netG resnet_9blocks2 --epsilonT 0.000025 --multi_parameter 8.0 --epsilon_multi_scale --test True
+python train.py --cfg configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name AdaNGF --model AdaNGF --lambda_edge 10 --netG resnet_9blocks2 --epsilonT 0.000025 --multi_parameter 8.0 --epsilon_multi_scale --test True
+```
+```bash
+python python train.py --cfg configs/Gold_Atlas/3d_GA.yaml --checkpoints_dir results/ --name AdaNGF_3D --model AdaNGF --lambda_edge 10 --netG resnet_9blocks2 --epsilonT 0.0000025 --multi_parameter 80.0 --epsilon_multi_scale --dim 3 --test True
 ```
 
 ### Evaluation Metrics
@@ -100,6 +106,29 @@ python train.py --cfg /configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ 
 The framework automatically computes **Image Quality** metrics: PSNR, SSIM, HaarPSI, MS-SSIM. 
 
 Those are store in `--checkpoints_dir` / `--name` / inf / metrics_{`--name`}.csv:
+
+### Other model architectures training:
+#### Cycle GAN
+```bash
+python train.py --cfg configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name CycleGAN --model cycle_gan --lambda_A 10 --lambda_B 10
+```
+#### CUT
+```bash
+python train.py --cfg configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name cut --model cut
+```
+
+#### UNIT
+```bash
+python train.py --cfg configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name UNIT --model UNIT --disc True
+```
+Where `--disc` allow to use the same discriminator architecture as in AdaNGF, CycleGAN or CUT. 
+
+#### NGF
+```bash
+python train.py --cfg configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ --name NGF --model NGF --lambda_NGF 10.0 --epsilonT 0.0002
+```
+
+
 
 ---
 ## Model Architecture
@@ -140,6 +169,8 @@ This work was partially supported by IMT Future & Ruptures.
 
 This implementation is based on:
 - [CycleGAN and pix2pix in PyTorch](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) by Jun-Yan Zhu
+- [CUT](https://github.com/taesungp/contrastive-unpaired-translation) by Taesung Park
+- [UNIT](https://github.com/mingyuliutw/UNIT) by Ming-Yu Liu
 - [MONAI](https://monai.io/) - Medical Open Network for AI
 
 We thank the authors for making their code publicly available.
@@ -161,12 +192,10 @@ For questions or issues, please:
 
 ## 🔗 Related Projects
 
-- [NEC: Normalized Edge Consistency](https://github.com/yourusername/NEC)
 - [CycleGAN](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
 - [CUT: Contrastive Unpaired Translation](https://github.com/taesungp/contrastive-unpaired-translation)
-- [CUT: Contrastive Unpaired Translation](https://github.com/taesungp/contrastive-unpaired-translation)
+- [UNIT](https://github.com/mingyuliutw/UNIT) by Ming-Yu Liu
 - [SynDiff](https://github.com/icon-lab/SynDiff)
-- [UNIT](https://github.com/mingyuliutw/UNIT)
 
 
 ---

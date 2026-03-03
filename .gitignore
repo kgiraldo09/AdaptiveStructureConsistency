@@ -1,2 +1,6 @@
 *.sh
 results
+configs/0commads.txt
+__pycache__/
+*.pyc
+*.pyo
