@@ -5,7 +5,7 @@ Official PyTorch implementation of **"Adaptive structure consistency for faithfu
 > **Authors:** Kevin Estiven Giraldo Paniagua, Pierre-Henri Conze, Vincent Jaouen, Elsa Angelini  
 > **Affiliations:** LTCI, Télécom Paris, Institut Polytechnique de Paris | IMT Atlantique, LaTIM UMR 1101, Inserm
 
-[![arXiv](https://img.shields.io/badge/arXiv-2XXX.XXXXX-b31b1b.svg)](https://arxiv.org/abs/XXXX.XXXXX)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -210,15 +210,21 @@ python train.py --cfg configs/Gold_Atlas/2d_GA.yaml --checkpoints_dir results/ -
 If you use this code for your research, please cite our paper:
 
 ```bibtex
-@article{giraldo2024adangf,
+@article{giraldo2024adasc,
   title={Adaptive structure consistency for faithful unpaired medical image synthesis},
   author={Giraldo Paniagua, Kevin Estiven and Conze, Pierre-Henri and Jaouen, Vincent and Angelini, Elsa},
-  journal={IEEE Transactions on Medical Imaging},
+  journal={IEEE Transactions on Image Processing},
   year={2024},
   volume={XX},
   number={XX},
   pages={1-15},
-  doi={10.1109/TMI.2024.XXXXXXX}
+  doi={10.1109/TIP.2024.XXXXXXX}
+}
+@inproceedings{AdaNGF_ISBI,
+  TITLE = {Adaptive gradient domain normalization for one-sided unsupervised medical image synthesis},
+  AUTHOR = {Giraldo Paniagua, Kevin and Conze, Pierre-Henri and Jaouen, Vincent and Angelini, Elsa},
+  BOOKTITLE = {{IEEE International Symposium on Biomedical Imaging}},
+  YEAR = {2026},
 }
 ```
 
@@ -262,6 +268,6 @@ For questions or issues, please:
 ---
 
 ## 📝 Updates
-
+- **[2026-01-13]**: AdaNGF Paper accepted at ISBI 2026
 - **[2026-XX-XX]**: Initial release
-- **[2026-XX-XX]**: Paper accepted at IEEE TMI
+- **[2026-XX-XX]**: Paper accepted at IEEE TIP
